@@ -31,6 +31,14 @@
               >Product</router-link
             >
           </li>
+          <li class="nav-item">
+            <router-link
+              class="nav-link active"
+              aria-current="page"
+              :to="{ name: APP_ROUTE_NAMES.PRODUCT_CREATE }"
+              >Add Product</router-link
+            >
+          </li>
         </ul>
         <ul class="d-flex navbar-nav">
           <li class="nav-item dropdown">
@@ -80,7 +88,7 @@
 </template>
 
 <script setup>
-import { APP_ROUTE_NAMES } from '@/router/routeNames'
+import { APP_ROUTE_NAMES } from '@/constants/routeNames'
 import { useRoute } from 'vue-router'
 import { useThemeStore } from '@/stores/themeStore'
 const themeStore = useThemeStore()

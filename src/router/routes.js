@@ -7,7 +7,7 @@ import ContactUs from '@/views/home/ContactUs.vue'
 import Home from '@/views/home/Home.vue'
 import ProductList from '@/views/product/ProductList.vue'
 import ProductUpsert from '@/views/product/ProductUpsert.vue'
-import { APP_ROUTE_NAMES } from './routeNames.js'
+import { APP_ROUTE_NAMES } from '../constants/routeNames.js'
 
 
 const router = createRouter({
@@ -47,6 +47,11 @@ const router = createRouter({
       path: '/product-list',
       name: APP_ROUTE_NAMES.PRODUCT_LIST,
       component: ProductList,
+    },
+    {
+      path: '/product-create',
+      name: APP_ROUTE_NAMES.PRODUCT_CREATE,
+      component: ProductUpsert,
     },
   ],
 })
