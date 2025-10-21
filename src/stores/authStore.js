@@ -3,7 +3,7 @@ import { ref, computed } from "vue";
 import { db, auth } from "@/utility/firebaseConfig.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
 import { ROLE_USER, ROLE_ADMIN } from "@/constants/appConstants";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 export const useAuthStore = defineStore("authStore", () => {
   const user = ref(null);
@@ -20,6 +20,7 @@ export const useAuthStore = defineStore("authStore", () => {
     onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         user.value = firebaseUser;
+        await fetchUserRole(firebaseUser.uid);
         initialized.value = true;
       } else {
         clearUser();
@@ -27,76 +28,80 @@ export const useAuthStore = defineStore("authStore", () => {
     })
   }
 
-  const signUpUser = async (email, password) => {
-    isLoading.value = true;
-    try {
-      const userCredentials = await createUserWithEmailAndPassword(auth, email, password);
-
-      await setDoc(doc(db, "users", userCredentials.user.uid), {
-        email: userCredentials.user.email,
-        role: ROLE_USER,
-        createdAt: new Date(),
-      });
-      clearUser();
-      error.value = null;
-    } catch (err) {
-      error.value = err.message;
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  };
-
-  const clearUser = () => {
-    user.value = null;
-    role.value = null;
+  const fetchUserRole = async (uid) => {
+    const userDoc = await getDoc(doc(db, "users", uid));
+    userDoc.exists() ? role.value = userDoc.data().role : role.value = null;
   }
 
-  const signInUser = async (email, password) => {
-    isLoading.value = true;
-    try {
-      const userCredentials = await signInWithEmailAndPassword(auth, email, password);
-      user.value = userCredentials.user;
-      user.role = ROLE_USER;
-      error.value = null;
-    } catch (err) {
-      error.value = err.message;
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  };
+  const signUpUser = async (email, password) => {
+  isLoading.value = true;
+  try {
+    const userCredentials = await createUserWithEmailAndPassword(auth, email, password);
 
-  const signOutUser = async () => {
-    isLoading.value = true;
-    try {
-      await signOut(auth);
-      clearUser();
-      error.value = null;
-    } catch (err) {
-      error.value = err.message;
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  };
+    await setDoc(doc(db, "users", userCredentials.user.uid), {
+      email: userCredentials.user.email,
+      role: ROLE_USER,
+      createdAt: new Date(),
+    });
+    clearUser();
+    error.value = null;
+  } catch (err) {
+    error.value = err.message;
+    throw err;
+  } finally {
+    isLoading.value = false;
+  }
+};
 
-  return {
-    //state
-    user,
-    role,
-    error,
-    isLoading,
-    initialized,
+const clearUser = () => {
+  user.value = null;
+  role.value = null;
+}
 
-    //getters
-    isAuthenticated,
-    isAdmin,
+const signInUser = async (email, password) => {
+  isLoading.value = true;
+  try {
+    const userCredentials = await signInWithEmailAndPassword(auth, email, password);
+    user.value = userCredentials.user;
+    error.value = null;
+  } catch (err) {
+    error.value = err.message;
+    throw err;
+  } finally {
+    isLoading.value = false;
+  }
+};
 
-    //actions
-    signUpUser,
-    signInUser,
-    initializeAuth,
-    signOutUser,
-  };
+const signOutUser = async () => {
+  isLoading.value = true;
+  try {
+    await signOut(auth);
+    clearUser();
+    error.value = null;
+  } catch (err) {
+    error.value = err.message;
+    throw err;
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+return {
+  //state
+  user,
+  role,
+  error,
+  isLoading,
+  initialized,
+
+  //getters
+  isAuthenticated,
+  isAdmin,
+
+  //actions
+  signUpUser,
+  signInUser,
+  initializeAuth,
+  signOutUser,
+};
 });
