@@ -90,7 +90,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import productService from '@/services/productService'
-import { useSwal } from '@/utility/useSwal'
+import { useSwal } from '@/composibles/useSwal'
 import ProductCard from '@/components/layout/Product/ProductCard.vue'
 import {
   PRODUCT_CATEGORIES,
