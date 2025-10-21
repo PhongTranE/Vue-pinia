@@ -22,6 +22,7 @@
             <div class="input-group mt-3 mx-auto shadow-lg rounded-4" style="max-width: 700px">
               <input
                 type="text"
+                v-model="searchValue"
                 class="form-control border-0 py-3 px-4 fs-5"
                 placeholder="Search your favorite product..."
               />
@@ -98,6 +99,7 @@ import { PRODUCT_CATEGORIES } from '@/constants/appConstants'
 
 const products = ref([])
 const loading = ref(true)
+const searchValue = ref('')
 const selectedCategory = ref('ALL')
 const categoryList = ref(['ALL', ...PRODUCT_CATEGORIES])
 onMounted(() => {
@@ -123,6 +125,12 @@ const filteredProductList = computed(() => {
       : products.value.filter(
           (item) => item.category.toUpperCase() === selectedCategory.value.toUpperCase(),
         )
+
+  if (searchValue.value) {
+    tempArray = tempArray.filter((item) => {
+      return item.name.toUpperCase().includes(searchValue.value.toUpperCase())
+    })
+  }
   return tempArray
 })
 </script>
