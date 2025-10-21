@@ -8,6 +8,7 @@ import Home from '@/views/home/Home.vue'
 import ProductList from '@/views/product/ProductList.vue'
 import ProductUpsert from '@/views/product/ProductUpsert.vue'
 import { APP_ROUTE_NAMES } from '../constants/routeNames.js'
+import { useAuthStore } from '@/stores/authStore.js'
 
 
 const router = createRouter({
@@ -60,5 +61,12 @@ const router = createRouter({
     },
   ],
 })
+router.beforeEach(async (toString, from) => {
+const authStore = useAuthStore()
+  if (!authStore.initialized) {
+    await authStore.initializeAuth()
+  }
+})
+
 
 export default router
