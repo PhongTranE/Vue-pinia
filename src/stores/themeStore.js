@@ -9,4 +9,5 @@ export const useThemeStore = defineStore("themeStore", () => {
     bodyElement.setAttribute("data-bs-theme", newTheme);
   };
   return { theme, setTheme };
-});
+}
+  , { persist: true });
